@@ -4,6 +4,7 @@ starfield watchface for Watchy
 * step count
 * sunrise/sunset time
 * moonphase
+
 ![picture](/assets/pic.png)
 
 # settings
