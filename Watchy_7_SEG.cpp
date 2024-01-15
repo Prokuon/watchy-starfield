@@ -1,5 +1,14 @@
 #include "Watchy_7_SEG.h"
+
+// DARKMODE
 #define DARKMODE false
+
+// HOUR_12_24, change it to 12 to switch to 12-hour
+#define HOUR_12_24 24
+
+// change it to your location 
+//          latitude, longitude, timezone
+#define LOC 31.00, 121.00, 8
 
 const uint8_t BATTERY_SEGMENT_WIDTH = 7;
 const uint8_t BATTERY_SEGMENT_HEIGHT = 11;
@@ -13,6 +22,7 @@ void Watchy7SEG::drawWatchFace()
 {
     display.fillScreen(DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
     display.setTextColor(DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    drawFiel ();
     drawTime();
     drawDate();
     drawSteps();
@@ -20,7 +30,7 @@ void Watchy7SEG::drawWatchFace()
     drawBattery();
     // drawEva();
     // drawLine();
-    drawFiel ();
+
     display.drawBitmap(118, 168, WIFI_CONFIGURED ? wifi : wifioff, 25, 18, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     // if(BLE_CONFIGURED)
     // {
@@ -56,11 +66,28 @@ void Watchy7SEG::drawTime()
     // display.println(currentTime.Minute);
     long ss = currentTime.Hour * 60 + currentTime.Minute;
     int sh = ss / 60;
+
+    if (HOUR_12_24 == 12 && sh >= 12)
+    {
+        display.fillRect(7, 60, 25, 9, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
+        display.drawBitmap(7, 60, pm, 25, 9, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    }
+    else if (HOUR_12_24 == 12 && sh < 12)
+    {
+        display.fillRect(7, 60, 25, 9, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
+        display.drawBitmap(7, 60, am, 25, 9, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    }
+
+    if (HOUR_12_24 == 12 && sh > 12)
+    {
+        sh -= 12;
+    }
     int sm = ss % 60;
     int a = sh >= 10 ? sh / 10 : 0;
     int b = sh % 10;
     int c = sm >= 10 ? sm / 10 : 0;
     int d = sm % 10;
+
     if (a == 0)
         display.drawBitmap(11, 5, fd_0, 33, 53, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     else if (a == 1)
@@ -144,6 +171,7 @@ void Watchy7SEG::drawTime()
         display.drawBitmap(155, 5, fd_8, 33, 53, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     else if (d == 9)
         display.drawBitmap(155, 5, fd_9, 33, 53, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+        
 }
 
 void Watchy7SEG::drawDate()
@@ -610,12 +638,12 @@ void Watchy7SEG::drawMoon() {
 }
 
 void Watchy7SEG::drawSun() {
-    Dusk2Dawn shangHai(31.00, 121.00, 8);
+    Dusk2Dawn location(LOC);
     int year = currentTime.Year + 1970;
     int32_t month = currentTime.Month;
     int32_t day = currentTime.Day;
-    int sr = shangHai.sunrise(year, month, day, false);
-    int ss = shangHai.sunset(year, month, day, false);
+    int sr = location.sunrise(year, month, day, false);
+    int ss = location.sunset(year, month, day, false);
 
     long k = currentTime.Hour * 60 + currentTime.Minute;
     int tk = (k - sr) * 60 / (ss - sr);
@@ -629,6 +657,16 @@ void Watchy7SEG::drawSun() {
     int rm = sr % 60;
     int sh = ss / 60;
     int sm = ss % 60;
+
+    if (HOUR_12_24 == 12 && rh > 12)
+    {
+        rh -= 12;
+    }
+
+    if (HOUR_12_24 == 12 && sh >12)
+    {
+        sh -= 12;
+    }
 
     int a = sh >= 10 ? sh / 10 : 0;
     int b = sh % 10;
