@@ -17,6 +17,6 @@ Starfield watchface for watchy
 # Credits
 
 * [moonPhase-esp32](https://github.com/CelliesProjects/moonPhase-esp32) 
-  * Utilized code from this repository to calculate lunar phases
+  Utilized code from this repository to calculate lunar phases
 * [Dusk2Dawn](https://github.com/dmkishi/Dusk2Dawn)
-  * Utilized code from this repository to calculate sunrise and sunset time
+  Utilized code from this repository to calculate sunrise and sunset time
