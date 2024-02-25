@@ -1,22 +1,60 @@
 #include "Watchy_7_SEG.h"
 
 // DARKMODE
-#define DARKMODE false
+// #define DARKMODE false
 
-// HOUR_12_24, change it to 12 to switch to 12-hour
-#define HOUR_12_24 24
+// HOUR_SET, change it to 12 to switch to 12-hour
+// #define HOUR_SET 24
 
 // change it to your location 
 //          latitude, longitude, timezone
 #define LOC 31.00, 121.00, 8
 
-const uint8_t BATTERY_SEGMENT_WIDTH = 7;
-const uint8_t BATTERY_SEGMENT_HEIGHT = 11;
-const uint8_t BATTERY_SEGMENT_SPACING = 9;
-const uint8_t WEATHER_ICON_WIDTH = 48;
-const uint8_t WEATHER_ICON_HEIGHT = 32;
+RTC_DATA_ATTR bool DARKMODE = false;
+// RTC_DATA_ATTR int showState = 0;
+RTC_DATA_ATTR bool HOUR_SET = true;
 
 moonPhaser moonP;
+
+void Watchy7SEG::handleButtonPress()
+{
+    if (guiState == WATCHFACE_STATE)
+    {
+        uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
+        if (wakeupBit & UP_BTN_MASK) 
+        {
+            // showState++;
+            // if (showState > 2) { showState = 0; }
+            HOUR_SET = !HOUR_SET;
+            RTC.read(currentTime);
+            showWatchFace(true);
+            return;
+        }
+        if (wakeupBit & DOWN_BTN_MASK) 
+        {
+            // showState--;
+            // if (showState < 0) { showState = 2; }
+            HOUR_SET = !HOUR_SET;
+            RTC.read(currentTime);
+            showWatchFace(true);
+            return;
+        }
+        if (wakeupBit & BACK_BTN_MASK) 
+        {
+            DARKMODE = !DARKMODE;
+            RTC.read(currentTime);
+            showWatchFace(true);
+            return;
+        } 
+        if (wakeupBit & MENU_BTN_MASK) 
+        {
+            Watchy::handleButtonPress();
+            return;
+        }
+    } 
+    else {Watchy::handleButtonPress();}
+    return;
+}
 
 void Watchy7SEG::drawWatchFace()
 {
@@ -45,7 +83,7 @@ void Watchy7SEG::drawTime()
     display.setFont(&DSEG7_Classic_Bold_53);
     display.setCursor(6, 53+5);
     // int displayHour;
-    // if(HOUR_12_24==12)
+    // if(HOUR_SET==12)
     // {
     //     displayHour = ((currentTime.Hour+11)%12)+1;
     // } 
@@ -67,18 +105,18 @@ void Watchy7SEG::drawTime()
     long ss = currentTime.Hour * 60 + currentTime.Minute;
     int sh = ss / 60;
 
-    if (HOUR_12_24 == 12 && sh >= 12)
+    if (HOUR_SET == false && sh >= 12)
     {
         display.fillRect(7, 60, 25, 9, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
         display.drawBitmap(7, 60, pm, 25, 9, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
-    else if (HOUR_12_24 == 12 && sh < 12)
+    else if (HOUR_SET == false && sh < 12)
     {
         display.fillRect(7, 60, 25, 9, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
         display.drawBitmap(7, 60, am, 25, 9, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
 
-    if (HOUR_12_24 == 12 && sh > 12)
+    if (HOUR_SET == false && sh > 12)
     {
         sh -= 12;
     }
@@ -658,12 +696,12 @@ void Watchy7SEG::drawSun() {
     int sh = ss / 60;
     int sm = ss % 60;
 
-    if (HOUR_12_24 == 12 && rh > 12)
+    if (HOUR_SET == false && rh > 12)
     {
         rh -= 12;
     }
 
-    if (HOUR_12_24 == 12 && sh >12)
+    if (HOUR_SET == false && sh >12)
     {
         sh -= 12;
     }
