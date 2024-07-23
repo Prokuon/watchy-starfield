@@ -2,7 +2,6 @@
 #define WATCHY_7_SEG_H
 #include <math.h>
 #include <Watchy.h>
-#include "Dusk2Dawn.h"
 #include "moonPhaser.h"
 #include "Seven_Segment10pt7b.h"
 #include "DSEG7_Classic_Regular_15.h"

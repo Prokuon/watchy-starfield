@@ -6,10 +6,6 @@
 // HOUR_SET, change it to 12 to switch to 12-hour
 // #define HOUR_SET 24
 
-// change it to your location 
-//          latitude, longitude, timezone
-#define LOC 31.00, 121.00, 8
-
 RTC_DATA_ATTR bool DARKMODE = false;
 // RTC_DATA_ATTR int showState = 0;
 RTC_DATA_ATTR bool HOUR_SET = true;
@@ -676,12 +672,9 @@ void Watchy7SEG::drawMoon() {
 }
 
 void Watchy7SEG::drawSun() {
-    Dusk2Dawn location(LOC);
-    int year = currentTime.Year + 1970;
-    int32_t month = currentTime.Month;
-    int32_t day = currentTime.Day;
-    int sr = location.sunrise(year, month, day, false);
-    int ss = location.sunset(year, month, day, false);
+    weatherData currentWeather = getWeatherData();
+    int sr = currentWeather.sunrise.Hour * 60 + currentWeather.sunrise.Minute;
+    int ss = currentWeather.sunset.Hour * 60 + currentWeather.sunset.Minute;
 
     long k = currentTime.Hour * 60 + currentTime.Minute;
     int tk = (k - sr) * 60 / (ss - sr);
